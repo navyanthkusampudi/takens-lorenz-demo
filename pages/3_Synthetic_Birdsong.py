@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 from utils.takens_utils import compute_delay_embedding
 from utils.plotting import plot_2d_scatter, plot_3d_scatter
+from utils.visuals import plot_syrinx_membrane
 
 st.set_page_config(page_title="Synthetic Birdsong", layout="wide")
 st.title("🎶 Synthetic Birdsong Generator")
@@ -53,3 +54,8 @@ else:
     else:
         st.plotly_chart(plot_3d_scatter(X[:, 0], X[:, 1], X[:, 2],
                                         title="3D Embedding"), use_container_width=True)
+
+st.subheader("Syrinx Vibration Preview")
+st.markdown("This shows how the bird’s vocal membrane vibrates at the current amplitude and frequency.")
+fig = plot_syrinx_membrane(amplitude=np.max(A), frequency=np.mean(f_mod))
+st.plotly_chart(fig, use_container_width=True)
