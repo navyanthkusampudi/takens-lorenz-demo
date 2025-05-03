@@ -55,3 +55,35 @@ def plot_3d_scatter(x, y, z, title="3D Scatter", color='blue'):
     )
 
     return fig
+
+
+
+def plot_time_series(y, title="Time Series", xlabel="Sample Index", ylabel="Amplitude", color='blue'):
+    x = np.arange(len(y))  # use indices as x-axis
+
+    fig = go.Figure()
+
+    # Line
+    fig.add_trace(go.Scatter(
+        x=x, y=y,
+        mode='lines',
+        line=dict(color='lightgray', width=1),
+        name='signal'
+    ))
+
+    # Markers
+    fig.add_trace(go.Scatter(
+        x=x, y=y,
+        mode='markers',
+        marker=dict(color=color, size=3),
+        name='samples'
+    ))
+
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlabel,
+        yaxis_title=ylabel,
+        margin=dict(l=40, r=40, b=40, t=40)
+    )
+
+    return fig

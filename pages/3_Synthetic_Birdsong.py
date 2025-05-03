@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 from utils.takens_utils import compute_delay_embedding
-from utils.plotting import plot_2d_scatter, plot_3d_scatter
+from utils.plotting import plot_2d_scatter, plot_3d_scatter, plot_time_series
 
 st.set_page_config(page_title="Synthetic Birdsong", layout="wide")
 st.title("🎶 Synthetic Birdsong Generator")
@@ -33,7 +33,7 @@ y = A * np.sin(phase)
 
 # Show waveform
 st.subheader("📈 Generated Signal")
-st.line_chart(y[:1000])  # preview
+st.plotly_chart(plot_time_series(y), use_container_width=True)
 
 # Takens embedding settings
 st.sidebar.header("Takens Embedding")
