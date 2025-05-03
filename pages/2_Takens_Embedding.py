@@ -4,7 +4,7 @@ from scipy.integrate import solve_ivp
 
 from utils.lorenz_solver import lorenz_system
 from utils.takens_utils import compute_delay_embedding
-from utils.plotting import plot_2d_scatter, plot_3d_scatter,plot_time_series
+from utils.plotting import plot_2d_scatter, plot_3d_scatter
 
 
 st.set_page_config(page_title="Takens Embedding", layout="wide")
@@ -51,7 +51,8 @@ signal = var_map[observed_var]
 
 # Preview signal
 st.subheader(f"📈 Observed Variable: {observed_var}(t)")
-st.plotly_chart(plot_time_series(signal), use_container_width=True)
+st.line_chart(signal[:500])
+st.plotly_chart(plot_time_series(y[:1000]), use_container_width=True)
 
 # --- Original Attractor ---
 st.subheader("🌀 Original Lorenz Attractor (x, y, z)")
