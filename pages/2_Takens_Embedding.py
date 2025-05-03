@@ -7,13 +7,16 @@ from utils.takens_utils import compute_delay_embedding
 from utils.plotting import plot_2d_scatter, plot_3d_scatter
 
 st.set_page_config(page_title="Takens Embedding", layout="wide")
-st.title("📉 Takens Embedding from Lorenz Attractor")
+st.title("📉 Takens Embedding from Lorenz System")
 
 st.markdown("""
-This tool reconstructs the phase space using **Takens’ theorem**, applied to the `x(t)` time series from the Lorenz system.
+Explore how Takens' theorem allows reconstruction of the phase space from a single variable.  
+Choose `x(t)`, `y(t)`, or `z(t)` from the Lorenz system to visualize and compare the original and reconstructed attractors.
 """)
 
-# Sidebar: Lorenz simulation settings
+# --- Sidebar Controls ---
+
+# Lorenz parameters
 st.sidebar.header("Lorenz Parameters")
 sigma = st.sidebar.slider("σ (sigma)", 0.1, 20.0, 10.0)
 beta = st.sidebar.slider("β (beta)", 0.1, 10.0, 8/3)
@@ -28,30 +31,46 @@ st.sidebar.header("Simulation Settings")
 T = st.sidebar.slider("Simulation Time (s)", 10, 100, 40)
 dt = st.sidebar.slider("Time Step", 0.001, 0.1, 0.01)
 
-# Sidebar: Embedding parameters
+# Embedding parameters
 st.sidebar.header("Embedding Parameters")
+observed_var = st.sidebar.selectbox("Variable for Embedding", options=["x", "y", "z"])
 tau = st.sidebar.slider("Delay (τ)", 1, 100, 10)
 m = st.sidebar.slider("Embedding Dimension (m)", 2, 10, 3)
 
-# Solve Lorenz system
+# --- Solve Lorenz System ---
 t_eval = np.arange(0, T, dt)
 sol = solve_ivp(lambda t, y: lorenz_system(t, y, sigma, rho, beta),
                 [0, T], [x0, y0, z0], t_eval=t_eval)
 
-x = sol.y[0]  # x(t) is the observed variable
+x, y, z = sol.y
 
-st.line_chart(x[:500])  # Show preview of x(t)
+# Choose variable
+var_map = {"x": x, "y": y, "z": z}
+signal = var_map[observed_var]
 
-# Perform Takens Embedding
-X = compute_delay_embedding(x, tau, m)
+# Preview signal
+st.subheader(f"📈 Observed Variable: {observed_var}(t)")
+st.line_chart(signal[:500])
+
+# --- Original Attractor ---
+st.subheader("🌀 Original Lorenz Attractor (x, y, z)")
+orig_fig = plot_3d_scatter(x, y, z, title="Original Lorenz Attractor")
+st.plotly_chart(orig_fig, use_container_width=True)
+
+# --- Takens Embedding ---
+X = compute_delay_embedding(signal, tau, m)
 
 if X is None:
     st.error("τ and m produce too few data points.")
 else:
-    st.markdown(f"**Embedding space (m={m}, τ={tau})**")
+    st.subheader(f"🔁 Reconstructed Attractor from {observed_var}(t)")
     if m == 2:
-        st.plotly_chart(plot_2d_scatter(X[:, 0], X[:, 1], title="2D Embedding", xlabel="x(t)", ylabel=f"x(t+{tau})"),
+        st.plotly_chart(plot_2d_scatter(X[:, 0], X[:, 1],
+                                        title=f"2D Embedding from {observed_var}(t)",
+                                        xlabel=f"{observed_var}(t)",
+                                        ylabel=f"{observed_var}(t+{tau})"),
                         use_container_width=True)
     else:
-        st.plotly_chart(plot_3d_scatter(X[:, 0], X[:, 1], X[:, 2], title="3D Embedding from x(t)"),
+        st.plotly_chart(plot_3d_scatter(X[:, 0], X[:, 1], X[:, 2],
+                                        title=f"3D Embedding from {observed_var}(t)"),
                         use_container_width=True)
