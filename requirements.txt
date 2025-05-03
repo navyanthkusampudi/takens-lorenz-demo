@@ -2,4 +2,3 @@ streamlit
 numpy
 scipy
 plotly
-pandas  # for time series handling
